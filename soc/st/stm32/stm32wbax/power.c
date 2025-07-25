@@ -18,7 +18,7 @@
 #include <stm32wbaxx_ll_system.h>
 #include <clock_control/clock_stm32_ll_common.h>
 
-#ifdef CONFIG_BT_STM32WBA
+#if defined(CONFIG_BT_STM32WBA) || defined(CONFIG_IEEE802154_STM32WBA)
 #include "scm.h"
 #endif
 
@@ -39,7 +39,7 @@ static void set_mode_stop(uint8_t substate_id)
 	 */
 	sys_cache_instr_disable();
 
-#ifdef CONFIG_BT_STM32WBA
+#if defined(CONFIG_BT_STM32WBA) || defined(CONFIG_IEEE802154_STM32WBA)
 	scm_setwaitstates(LP);
 #endif
 	/* Set SLEEPDEEP bit of Cortex System Control Register */
@@ -131,7 +131,7 @@ void pm_state_set(enum pm_state state, uint8_t substate_id)
 /* Handle SOC specific activity after Low Power Mode Exit */
 void pm_state_exit_post_ops(enum pm_state state, uint8_t substate_id)
 {
-#ifdef CONFIG_BT_STM32WBA
+#if defined(CONFIG_BT_STM32WBA) || defined(CONFIG_IEEE802154_STM32WBA)
 	if (LL_PWR_IsActiveFlag_STOP() == 1U) {
 		scm_setup();
 	} else {
@@ -175,7 +175,7 @@ void pm_state_exit_post_ops(enum pm_state state, uint8_t substate_id)
 	}
 
 	/* When BLE is enabled, clock restoration is performed by SCM */
-#if !defined(CONFIG_BT_STM32WBA)
+#if !(defined(CONFIG_BT_STM32WBA) || defined(CONFIG_IEEE802154_STM32WBA))
 	stm32_clock_control_init(NULL);
 #endif
 
@@ -191,7 +191,7 @@ void pm_state_exit_post_ops(enum pm_state state, uint8_t substate_id)
 void stm32_power_init(void)
 {
 
-#ifdef CONFIG_BT_STM32WBA
+#if defined(CONFIG_BT_STM32WBA) || defined(CONFIG_IEEE802154_STM32WBA)
 	scm_init();
 #endif
 
